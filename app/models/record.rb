@@ -8,6 +8,14 @@ class Record < ActiveRecord::Base
     }
   end
   
+  def url_visits
+    Record.where(url: self.url).length
+  end
+  
+  def referrer_visits
+    Record.where(referrer: self.url).length
+  end
+  
   private
   
   def create_hash
