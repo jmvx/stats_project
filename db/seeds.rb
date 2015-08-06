@@ -1,7 +1,11 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
+# Sample Data
+
+1000.times do |n|
+  a_url = [Faker::Internet.url, "http://apple.com", "https://apple.com", "https://www.apple.com", "http://developer.apple.com", "http://en.wikipedia.org", "http://opensource.org"].sample
+  a_referrer = [Faker::Internet.url, "http://apple.com", "https://apple.com", "https://www.apple.com", "http://developer.apple.com", nil].sample
+  time = Faker::Time.between(DateTime.now - 10, DateTime.now)
+
+  Record.create!( url: a_url,
+                  referrer: a_referrer,
+                  created_at: time )
+end
