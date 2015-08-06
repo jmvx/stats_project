@@ -1,13 +1,15 @@
 class RecordsController < ApplicationController
   def index
     @records = Record.all
-    render :json => @records.all.group(:created_at)
+    render :json => @records
   end
 
   def new
   end
 
   def show
+    @record = Record.find(params[:id])
+    render :json => @record
   end
 
   # post /records.json
@@ -16,7 +18,7 @@ class RecordsController < ApplicationController
     respond_to do |format|
       if @record.save
         format.html { redirect_to root }
-        format.json { render :show, status: :ok, location: @record }
+        format.json { render json: @record }
       else
         format.html { redirect_to root }
         format.json { render json: @record.errors, status: :unprocessable_entity}
@@ -29,4 +31,5 @@ class RecordsController < ApplicationController
     def record_params
       params.require(:record).permit(:url, :referrer, :created_at)
     end
+
 end
