@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
+  root 'records#index'
   get 'records/new'
-  get 'top_urls' => 'records#show'
   resources 'records'
 end
