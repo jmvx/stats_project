@@ -2,17 +2,21 @@ class Record < ActiveRecord::Base
   before_save :create_hash
   
   def as_json(options={})
-    {
-      url: url,
-      referrer: referrer
-    }
+    # {
+    #   url: url,
+    #   referrer: referrer
+    # }
+    
+    super((options || { }).merge({
+        :methods => [:visits, :referrers]
+    }))
   end
   
-  def url_visits
+  def visits
     Record.where(url: self.url).length
   end
   
-  def referrer_visits
+  def referrers
     Record.where(referrer: self.url).length
   end
   

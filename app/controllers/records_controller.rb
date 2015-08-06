@@ -11,7 +11,8 @@ class RecordsController < ApplicationController
 
   def show
     @record = Record.find(params[:id])
-    @visits = @record.url_visits
+    @visits = @record.visits
+    @referrers = @record.referrers
     # @visits = num_visits(@record.url)
     # render :json => @record
   end
