@@ -1,6 +1,6 @@
 class RecordsController < ApplicationController
   def index
-    @records = Record.all
+    @records = Record.all.group_by{|record| record.created_at.strftime("%Y-%m-%d")}
     render :json => @records
   end
 

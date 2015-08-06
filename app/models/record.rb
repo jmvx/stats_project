@@ -1,6 +1,13 @@
 class Record < ActiveRecord::Base
   before_save :create_hash
   
+  def as_json(options={})
+    {
+      url: url,
+      referrer: referrer
+    }
+  end
+  
   private
   
   def create_hash
