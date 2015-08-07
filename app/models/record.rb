@@ -7,9 +7,13 @@ class Record < ActiveRecord::Base
     #   referrer: referrer
     # }
     
-    super((options || { }).merge({
-        :methods => [:visits, :referrers]
-    }))
+    # super((options || { }).merge({
+    #     :methods => [:visits, :referrers],
+    # }))
+    
+    super(:only => [:url],
+    :methods => [:visits, :referrers]
+    )
   end
   
   def visits

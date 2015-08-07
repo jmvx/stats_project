@@ -1,9 +1,10 @@
 class RecordsController < ApplicationController
   def index
-    @records = Record.all.order(:created_at).group_by{|record| record.created_at.strftime("%Y-%m-%d")}.take(5)
-    # Record.find_each(:batch_size => 5) do |r|
-    render :json => @records
-    # render :json => @sorted
+    @records = Record.all.order(created_at: :desc).group_by{|record| record.created_at.strftime("%Y-%m-%d")}
+    respond_to do |format|
+      format.html
+      format.json { render json: @records }
+    end
   end
 
   def new
@@ -13,8 +14,6 @@ class RecordsController < ApplicationController
     @record = Record.find(params[:id])
     @visits = @record.visits
     @referrers = @record.referrers
-    # @visits = num_visits(@record.url)
-    # render :json => @record
   end
 
   # post /records.json
@@ -32,10 +31,6 @@ class RecordsController < ApplicationController
   end
 
   private
-  
-    # def num_visits(url)
-    #   Record.where(url: url).length
-    # end
 
     def record_params
       params.require(:record).permit(:url, :referrer, :created_at)

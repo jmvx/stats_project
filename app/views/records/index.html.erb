@@ -1,3 +1,12 @@
-<h1>Records#INDEX</h1>
+<h1>Number of Page Views PER URL, LAST 5 DAYS</h1>
 
-<%= @records %>
+<div>
+  <% @records.each do |record| %>
+    <strong>DATE: <%= record[0] %></strong> <br />
+      <ul>
+      <% record[1].each do |r| %>
+        <li>URL: <%= r.url %> <strong>VISITS: <%= r.visits %></strong></li>
+      <% end %>
+      </ul>
+  <% end %>
+</div>
