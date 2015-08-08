@@ -1,8 +1,16 @@
 class RecordsController < ApplicationController
+  
+  def top_urls
+    @records = by_day
+    render json: @records
+  end
+  
+  def top_referrers
+    @records = by_day
+    render json: @records
+  end
+  
   def index
-    @records = Record.all.order(created_at: :desc )
-    @records_by_day = @records.group_by{ |record| record.created_at.to_date }
-    render json: @records_by_day
   end
 
   def new
@@ -28,10 +36,9 @@ class RecordsController < ApplicationController
   end
 
   private
-  
-    def sort_items
-      # Record.all.order(created_at: :desc).group_by{ |record| record.created_at.to_date }
-        Record.find(:all, :order => 'created_at, url')
+    
+    def by_day
+      Record.all.order(created_at: :desc ).group_by{ |record| record.created_at.to_date }
     end
 
     def record_params
