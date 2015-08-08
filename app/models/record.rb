@@ -8,12 +8,14 @@ class Record < ActiveRecord::Base
   end
   
   def visits
-    Record.where("date(created_at) = ?", created_at.to_date).where(url: self.url).length
+     self.url).length
+    records = urls_today.length
+    
   end
   
   def referrers
     array = []
-    records = Record.where("date(created_at) = ?", created_at.to_date).where(url: self.url).group(:referrer).count
+    records = urls_today.group(:referrer).count
     records.each do |link, freq|
       ref_pair = {}
       if link != nil
@@ -30,6 +32,10 @@ class Record < ActiveRecord::Base
   end
   
   private
+  
+  def urls_today
+    Record.where('created_at BETWEEN ? AND ?', created_at.beginning_of_day, created_at.end_of_day).where(url: self.url)
+  end
   
   def create_hash
     require 'digest/md5'
