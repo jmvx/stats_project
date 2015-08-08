@@ -1,10 +1,8 @@
 class RecordsController < ApplicationController
   def index
-    @records = Record.all.order(created_at: :desc).group_by{|record| record.created_at.strftime("%Y-%m-%d")}
-    respond_to do |format|
-      format.html
-      format.json { render json: @records }
-    end
+    @records = Record.all.order(created_at: :desc )
+    @records_by_day = @records.group_by{ |record| record.created_at.to_date }
+    render json: @records_by_day
   end
 
   def new
@@ -13,7 +11,6 @@ class RecordsController < ApplicationController
   def show
     @record = Record.find(params[:id])
     @visits = @record.visits
-    @referrers = @record.referrers
   end
 
   # post /records.json
@@ -31,6 +28,11 @@ class RecordsController < ApplicationController
   end
 
   private
+  
+    def sort_items
+      # Record.all.order(created_at: :desc).group_by{ |record| record.created_at.to_date }
+        Record.find(:all, :order => 'created_at, url')
+    end
 
     def record_params
       params.require(:record).permit(:url, :referrer, :created_at)
