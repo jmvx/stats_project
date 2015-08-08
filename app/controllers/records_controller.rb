@@ -38,7 +38,8 @@ class RecordsController < ApplicationController
   private
     
     def by_day
-      Record.all.order(created_at: :desc ).group_by{ |record| record.created_at.to_date }
+      # Record.all.order(created_at: :desc ).group_by{ |record| record.created_at.to_date }
+      Record.all.where("created_at > ?", 4.days.ago).order(created_at: :desc ).group_by{ |record| record.created_at.to_date }
     end
 
     def record_params

@@ -12,20 +12,22 @@ class Record < ActiveRecord::Base
   end
   
   def referrers
-    count = 0
-    records = Record.where("date(created_at) = ?", created_at.to_date).where(url: self.url)
-    records.each do |r|
-      if r.referrer != nil
-        count += 1
+    array = []
+    records = Record.where("date(created_at) = ?", created_at.to_date).where(url: self.url).group(:referrer).count
+    records.each do |link, freq|
+      ref_pair = {}
+      if link != nil
+        ref_pair.store(:url, link)
+        ref_pair.store(:visits, freq)
+        array.push(ref_pair)
+        if array.size == 5
+          break
+        end
       end
     end
-    return count
+    sorted = array.sort_by { |k| k[:visits] }.reverse.first(5)
+    return sorted
   end
-  
-  # def urls
-  #   date = created_at.to_date
-  #   unique_ids = Record.where("date(created_at) = ?", created_at.to_date).uniq.pluck(:id)
-  # end
   
   private
   
