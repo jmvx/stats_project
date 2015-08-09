@@ -2,12 +2,18 @@ class RecordsController < ApplicationController
   
   def top_urls
     @records = by_day
-    render json: @records
+    respond_to do |format|
+      format.html
+      format.json { render :json => @records }
+    end
   end
   
   def top_referrers
     @records = by_day
-    render json: @records
+    respond_to do |format|
+      format.html 
+      format.json { render :json => @records.as_json(:methods => [:visits, :referrers])}
+    end
   end
   
   def index
@@ -38,8 +44,7 @@ class RecordsController < ApplicationController
   private
     
     def by_day
-      # Record.all.order(created_at: :desc ).group_by{ |record| record.created_at.to_date }
-      Record.all.where("created_at > ?", 4.days.ago).order(created_at: :desc ).group_by{ |record| record.created_at.to_date }
+      Record.all.where("created_at < ?", 6.days.ago).order(created_at: :desc ).group_by{ |record| record.created_at.to_date }
     end
 
     def record_params

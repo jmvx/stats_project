@@ -1,16 +1,12 @@
 class Record < ActiveRecord::Base
   before_save :create_hash
   
-  def as_json(options={})
-    super(  :only => [:url],
-            :methods => [:visits, :referrers]
-    )
+  def as_json(options)
+    super({ :only => [:url], :methods => [:visits]}.merge(options))
   end
   
   def visits
-     self.url).length
-    records = urls_today.length
-    
+    records = urls_today.size
   end
   
   def referrers
@@ -22,9 +18,6 @@ class Record < ActiveRecord::Base
         ref_pair.store(:url, link)
         ref_pair.store(:visits, freq)
         array.push(ref_pair)
-        if array.size == 5
-          break
-        end
       end
     end
     sorted = array.sort_by { |k| k[:visits] }.reverse.first(5)
@@ -34,7 +27,7 @@ class Record < ActiveRecord::Base
   private
   
   def urls_today
-    Record.where('created_at BETWEEN ? AND ?', created_at.beginning_of_day, created_at.end_of_day).where(url: self.url)
+    Record.where(created_at: created_at.beginning_of_day..created_at.end_of_day).where(url: self.url)
   end
   
   def create_hash

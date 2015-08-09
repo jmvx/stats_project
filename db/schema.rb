@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150806043721) do
+ActiveRecord::Schema.define(version: 20150808170033) do
 
   create_table "records", force: :cascade do |t|
     t.string   "url",         limit: 255
@@ -20,5 +20,7 @@ ActiveRecord::Schema.define(version: 20150806043721) do
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
   end
+
+  add_index "records", ["created_at", "url"], name: "index_records_on_created_at_and_url", using: :btree
 
 end
