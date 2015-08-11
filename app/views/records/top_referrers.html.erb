@@ -1,0 +1,18 @@
+<h1>Number of page views, per url, during the last 5 days</h1>
+
+<div class="container" ng-app="MyAnalytics" ng-controller="getData">
+
+<div class="section">
+  <h2>Referrers</h2>
+  <div class="report" ng-repeat="(date,report) in reports">
+    <h3>{{ date }}</h3>
+    <div ng-repeat="data in report">
+      <div ng-repeat="ref in data.referrers">
+        <h2>{{data.referrers}}</h2>
+        <!-- <a href="{{ref.url}}">{{ref.url}}</a> has visited <a href="{{data.url}}">{{ data.url }}</a> {{ref.visits}} times -->
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>

@@ -1,33 +1,58 @@
 class Record < ActiveRecord::Base
-  before_save :create_hash
+  before_save :create_hash  
   
   def as_json(options)
-    super({ :only => [:url], :methods => [:visits]}.merge(options))
+    super({ :only => [], :methods => [:top_urls]}.merge(options))
   end
   
-  def visits
-    records = urls_today.size
+  def last_five_days
+    Record.order('created_at desc').uniq.limit(5).pluck("DATE_FORMAT(created_at, '%Y-%m-%d')")
   end
   
-  def referrers
+  def the_date
+    self.created_at.to_date
+  end
+  
+  def top_urls
     array = []
-    records = urls_today.group(:referrer).count
+    records = urls_today.group(:url).count.sort_by {|link, freq| freq }.reverse
     records.each do |link, freq|
-      ref_pair = {}
-      if link != nil
-        ref_pair.store(:url, link)
-        ref_pair.store(:visits, freq)
-        array.push(ref_pair)
-      end
+      url_visits = {}
+      url_visits.store(:url, link)
+      url_visits.store(:visits, freq)
+      array.push(url_visits)
     end
-    sorted = array.sort_by { |k| k[:visits] }.reverse.first(5)
-    return sorted
+    return array
+  end
+  
+  def top_referrers 
+    array = []
+    records = urls_today.group(:url).count.sort_by {|link, freq| freq }.reverse.first(10)
+    records.each do |link, freq|
+      url_visits = {}
+      url_visits.store(:url, link)
+      url_visits.store(:visits, freq)
+      records_refs = Record.where('url = ?', self.url).group(:referrer).count.sort_by {|link, freq| freq }.reverse.first(5)
+      ref_array = []
+      records_refs.each do |rlink, rfreq|
+        if rlink != nil
+          refs = {}
+          refs.store(:url, rlink)
+          refs.store(:visits, rfreq)
+          ref_array.push(refs)
+          url_visits.store(:referrers, ref_array)
+        end
+      end
+      array.push(url_visits)
+    end
+    return array
+    
   end
   
   private
   
   def urls_today
-    Record.where(created_at: created_at.beginning_of_day..created_at.end_of_day).where(url: self.url)
+    Record.where('date(created_at) = ?', the_date)
   end
   
   def create_hash

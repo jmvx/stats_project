@@ -1,7 +1,7 @@
 class RecordsController < ApplicationController
   
   def top_urls
-    @records = by_day
+    @records = five_day_records.group_by{|record| record.created_at.to_date }
     respond_to do |format|
       format.html
       format.json { render :json => @records }
@@ -9,10 +9,10 @@ class RecordsController < ApplicationController
   end
   
   def top_referrers
-    @records = by_day
+    @records = five_day_records.group_by{|record| record.created_at.to_date }
     respond_to do |format|
       format.html 
-      format.json { render :json => @records.as_json(:methods => [:visits, :referrers])}
+      format.json { render :json => @records.to_json(:methods => [:top_referrers])}
     end
   end
   
@@ -24,7 +24,6 @@ class RecordsController < ApplicationController
 
   def show
     @record = Record.find(params[:id])
-    @visits = @record.visits
   end
 
   # post /records.json
@@ -42,9 +41,15 @@ class RecordsController < ApplicationController
   end
 
   private
+  
+    def last_five_days
+      Record.uniq.order('created_at desc').limit(5).pluck("DATE_FORMAT(created_at, '%Y-%m-%d')")
+    end
     
-    def by_day
-      Record.all.where("created_at < ?", 6.days.ago).order(created_at: :desc ).group_by{ |record| record.created_at.to_date }
+    def five_day_records
+      end_day = last_five_days.first.to_datetime.end_of_day
+      start_day = last_five_days.last.to_datetime.beginning_of_day
+      return Record.where(:created_at => start_day..end_day).order('created_at desc').group("date(created_at)")
     end
 
     def record_params
