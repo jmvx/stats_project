@@ -1,15 +1,19 @@
-<h1>Number of page views, per url, during the last 5 days</h1>
+<h1 class="page_title">Number of Page Views Per URL: Last 5 Days</h1>
 
-<div class="container" ng-app="MyAnalytics" ng-controller="getData">
+<div class="container" ng-app="MyAnalytics" ng-controller="getTopUrls">
 
-<div class="section">
-  <h2>Visits</h2>
-  <div class="report" ng-repeat="(date,report) in reports' ">
-    <h3>{{ date }}</h3>
-    <div ng-repeat="data in report">
-      <a href="{{data.url}}">{{data.url}}</a> has been visited {{data.visits}} times.
-    </div>
-  </div>
-</div>
-
+<div ng-repeat="(date, stuff) in reports ">
+  <h2 class="date">{{ date }}</h2>
+  <table>
+    <tr>
+      <th>URL</th>
+      <th>VISITS</th>
+    </tr>
+    <tbody ng-repeat="(tag, data) in stuff[0] ">
+      <tr ng-repeat="record in data ">
+        <td>{{ record.url }}</td>
+        <td>{{ record.visits }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

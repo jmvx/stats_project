@@ -1,21 +1,14 @@
 class Record < ActiveRecord::Base
-  before_save :create_hash  
+  before_save :create_hash
   
   def as_json(options)
     super({ :only => [], :methods => [:top_urls]}.merge(options))
   end
   
-  def last_five_days
-    Record.order('created_at desc').uniq.limit(5).pluck("DATE_FORMAT(created_at, '%Y-%m-%d')")
-  end
-  
-  def the_date
-    self.created_at.to_date
-  end
-  
   def top_urls
     array = []
-    records = urls_today.group(:url).count.sort_by {|link, freq| freq }.reverse
+    urls = get_urls_today
+    records = urls.group(:url).count.sort_by {|link, freq| freq }.reverse!
     records.each do |link, freq|
       url_visits = {}
       url_visits.store(:url, link)
@@ -27,12 +20,15 @@ class Record < ActiveRecord::Base
   
   def top_referrers 
     array = []
-    records = urls_today.group(:url).count.sort_by {|link, freq| freq }.reverse.first(10)
+    urls = get_urls_today
+    records = urls.group(:url).count.sort_by {|link, freq| freq }.reverse!.first(10)
     records.each do |link, freq|
+      
       url_visits = {}
       url_visits.store(:url, link)
       url_visits.store(:visits, freq)
-      records_refs = urls_today.where('url = ?', link).group(:referrer).count.sort_by {|ref_link, ref_freq| ref_freq }.reverse.first(5)
+      
+      records_refs = Record.where('date(created_at) = ? AND url = ?', the_date, link).group(:referrer).count.sort_by {|ref_link, ref_freq| ref_freq }.reverse.first(5)
       ref_array = []
       records_refs.each do |rlink, rfreq|
         if rlink != nil
@@ -42,6 +38,7 @@ class Record < ActiveRecord::Base
           ref_array.push(refs)
           url_visits.store(:referrers, ref_array)
         end
+        
       end
       array.push(url_visits)
     end
@@ -51,8 +48,18 @@ class Record < ActiveRecord::Base
   
   private
   
-  def urls_today
+  def last_five_days
+    Record.order('created_at desc').uniq.limit(5).pluck("DATE_FORMAT(created_at, '%Y-%m-%d')")
+  end
+  
+  def the_date
+    self.created_at.to_date
+  end
+  
+  def get_urls_today
     Record.where('date(created_at) = ?', the_date)
+    # Record.where('date(created_at) = ?', [last_five_days] )
+    # Record.where('date(created_at) in (?)', last_five_days)
   end
   
   def create_hash

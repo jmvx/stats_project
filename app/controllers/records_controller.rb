@@ -49,7 +49,7 @@ class RecordsController < ApplicationController
     def five_day_records
       end_day = last_five_days.first.to_datetime.end_of_day
       start_day = last_five_days.last.to_datetime.beginning_of_day
-      return Record.where(:created_at => start_day..end_day).order('created_at desc').group("date(created_at)")
+      return Record.where(:created_at => start_day..end_day).order('created_at DESC').group("date(created_at)")
     end
 
     def record_params
