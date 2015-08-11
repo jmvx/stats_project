@@ -32,7 +32,7 @@ class Record < ActiveRecord::Base
       url_visits = {}
       url_visits.store(:url, link)
       url_visits.store(:visits, freq)
-      records_refs = Record.where('url = ?', self.url).group(:referrer).count.sort_by {|link, freq| freq }.reverse.first(5)
+      records_refs = urls_today.where('url = ?', link).group(:referrer).count.sort_by {|ref_link, ref_freq| ref_freq }.reverse.first(5)
       ref_array = []
       records_refs.each do |rlink, rfreq|
         if rlink != nil
