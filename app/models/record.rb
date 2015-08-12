@@ -5,17 +5,23 @@ class Record < ActiveRecord::Base
     super({ :only => [], :methods => [:top_urls]}.merge(options))
   end
   
-  def top_urls
-    array = []
-    urls = get_urls_today
-    records = urls.group(:url).count.sort_by {|link, freq| freq }.reverse!
-    records.each do |link, freq|
+  def self.top_urls
+#    array = []
+#    urls = get_urls_today
+#    records = urls.group(:url).count.sort_by {|link, freq| freq }.reverse!
+   end_day = DateTime.current
+   start_day = end_day-5
+   records = Record.select("url, count('url') AS total, date(created_at) AS date").where(:created_at => start_day..end_day).group("date(created_at)").group(:url).order('date(created_at) DESC').order("count('url') DESC")
+   # record_hash = {}
+   # record_hash[date] =
+   obj = Hash.new{|hash, key| hash[key] = Array.new}
+   records.each do |record|
       url_visits = {}
-      url_visits.store(:url, link)
-      url_visits.store(:visits, freq)
-      array.push(url_visits)
+      url_visits.store(:url, record.url)
+      url_visits.store(:visits, record.total)
+      obj[record.date].push(url_visits)
     end
-    return array
+    return obj
   end
   
   def top_referrers 
@@ -48,18 +54,12 @@ class Record < ActiveRecord::Base
   
   private
   
-  def last_five_days
-    Record.order('created_at desc').uniq.limit(5).pluck("DATE_FORMAT(created_at, '%Y-%m-%d')")
-  end
-  
   def the_date
     self.created_at.to_date
   end
   
   def get_urls_today
     Record.where('date(created_at) = ?', the_date)
-    # Record.where('date(created_at) = ?', [last_five_days] )
-    # Record.where('date(created_at) in (?)', last_five_days)
   end
   
   def create_hash

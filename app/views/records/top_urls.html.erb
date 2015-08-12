@@ -2,15 +2,15 @@
 
 <div class="container" ng-app="MyAnalytics" ng-controller="getTopUrls">
 
-<div ng-repeat="(date, stuff) in reports ">
+<div ng-repeat="(date, data) in reports ">
   <h2 class="date">{{ date }}</h2>
   <table>
     <tr>
       <th>URL</th>
       <th>VISITS</th>
     </tr>
-    <tbody ng-repeat="(tag, data) in stuff[0] ">
-      <tr ng-repeat="record in data ">
+    <tbody>
+      <tr ng-repeat="(id, record) in data">
         <td>{{ record.url }}</td>
         <td>{{ record.visits }}</td>
       </tr>
