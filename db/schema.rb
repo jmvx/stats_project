@@ -11,17 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150812055737) do
+ActiveRecord::Schema.define(version: 20150812215643) do
 
   create_table "records", force: :cascade do |t|
-    t.string   "url",         limit: 255
-    t.string   "referrer",    limit: 255
-    t.string   "record_hash", limit: 255
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.string   "url",             limit: 255
+    t.string   "referrer",        limit: 255
+    t.string   "record_hash",     limit: 255
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.date     "date_created_at",             null: false
   end
 
   add_index "records", ["created_at", "url"], name: "index_records_on_created_at_and_url", using: :btree
+  add_index "records", ["date_created_at", "url"], name: "index_records_on_date_created_at_and_url", using: :btree
+  add_index "records", ["url", "created_at"], name: "url", using: :btree
+  add_index "records", ["url", "date_created_at"], name: "index_records_on_url_and_date_created_at", using: :btree
   add_index "records", ["url"], name: "index_records_on_url", using: :btree
 
 end
