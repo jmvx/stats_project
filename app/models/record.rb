@@ -1,19 +1,10 @@
 class Record < ActiveRecord::Base
   before_save :create_hash
   
-  def as_json(options)
-    super({ :only => [], :methods => [:top_urls]}.merge(options))
-  end
-  
   def self.top_urls
-#    array = []
-#    urls = get_urls_today
-#    records = urls.group(:url).count.sort_by {|link, freq| freq }.reverse!
    end_day = DateTime.current
    start_day = end_day-5
    records = Record.select("url, count('url') AS total, date(created_at) AS date").where(:created_at => start_day..end_day).group("date(created_at)").group(:url).order('date(created_at) DESC').order("count('url') DESC")
-   # record_hash = {}
-   # record_hash[date] =
    obj = Hash.new{|hash, key| hash[key] = Array.new}
    records.each do |record|
       url_visits = {}
@@ -24,7 +15,7 @@ class Record < ActiveRecord::Base
     return obj
   end
   
-  def top_referrers 
+  def self.top_referrers 
     array = []
     urls = get_urls_today
     records = urls.group(:url).count.sort_by {|link, freq| freq }.reverse!.first(10)
@@ -53,14 +44,6 @@ class Record < ActiveRecord::Base
   end
   
   private
-  
-  def the_date
-    self.created_at.to_date
-  end
-  
-  def get_urls_today
-    Record.where('date(created_at) = ?', the_date)
-  end
   
   def create_hash
     require 'digest/md5'
