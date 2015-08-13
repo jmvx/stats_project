@@ -14,8 +14,7 @@ class Record < ActiveRecord::Base
       obj[record.date_created_at].push(url_visits)
     end
     end_time = Time.current.utc
-    answer = end_time - start_time
-    p answer
+    puts end_time - start_time
     return obj
   end
   
@@ -41,6 +40,7 @@ class Record < ActiveRecord::Base
         refs = []
         # Query for top 5 referrers on a particular day and for a particular url
         referrers = Record.select("referrer, count(referrer) AS ref_total").where('date_created_at = ? and url = ?', the_date, t.url).group(:referrer).order(:url).order('ref_total DESC').limit(5)
+        start_time = Time.current.utc
         referrers.each do |r|
           # create referrer url-visits hash
           ref_visits = {}
@@ -49,6 +49,9 @@ class Record < ActiveRecord::Base
           # add to array of referrers
           refs.push(ref_visits)
         end
+        end_time = Time.current.utc
+        puts end_time - start_time 
+        
         # push array of referrers onto url_visits
         url_visits.store(:referrers, refs)
         
