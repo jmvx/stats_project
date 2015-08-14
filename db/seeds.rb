@@ -33,7 +33,7 @@ ActiveRecord::Base.transaction do
     # Generate a random number
     # If random number exceeds the size of the array, generate fake url
     # Otherwise, use the url at the array index
-    # Multiplying the max value by 2 increases the ratio of random URLs
+    # Multiplying the max value by 2 helps increases the ratio of random URLs
     url_index = random.rand(urls_max * 2)
     ref_index = random.rand(refs_max * 2)
     url = url_index < urls_max ? urls[url_index] : "http://" + Faker::Internet.domain_name
