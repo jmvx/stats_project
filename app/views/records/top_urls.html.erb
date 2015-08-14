@@ -1,12 +1,14 @@
-<a name="top"><h1 class="page_title">Number of Page Views Per URL: Last 5 Days</h1></a>
+<a name="top"><h1 class="page_title">Number of Page Views Per URL</h1></a>
 
 <div class="container" ng-app="MyAnalytics" ng-controller="getTopUrls">
 
-<ul class="navigation" ng-repeat="(date, data) in reports">
-  <li><a href="#{{date}}">{{ date }}</a></li>
+<ul class="navigation">
+  <li ng-repeat="(date, data) in reports">
+    <a href="#{{date}}">{{ date }}</a>
+  </li>
 </ul>
   
-<div ng-repeat="(date, data) in reports ">
+<div ng-repeat="(date, data) in reports">
   <a name="{{date}}"><h2 class="date">{{ date }}</h2></a> 
   <a href="#top"><span class="back">Go back to top</span></a>
   <table>

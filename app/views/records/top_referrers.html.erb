@@ -1,9 +1,11 @@
-<h1 class="page_title">Top 5 Referrers for the Top 10 URLs: Last 5 Days </h1>
+<h1 class="page_title">Top 5 Referrers for the Top 10 URLs</h1>
 
 <div class="container" ng-app="MyAnalytics" ng-controller="getTopReferrers">
   
-<ul class="navigation" ng-repeat="(date, data) in reports">
-  <li><a href="#{{date}}">{{ date }}</a></li>
+<ul class="navigation">
+  <li ng-repeat="(date, data) in reports">
+    <a href="#{{date}}">{{ date }}</a>
+  </li>
 </ul>
 
 <div ng-repeat="(date, array) in reports">
@@ -15,17 +17,15 @@
       <th>VISITS</th>
       <th>REFERRERS</th>
     </tr>
-    <tbody ng-repeat="data in array ">
-      <tr>
-        <td>{{ data.url }}</td>
-        <td>{{ data.visits }}</td>
-        <td> 
-          <div class="referrer" ng-repeat="ref in data.referrers">
-            <div class="ref_url">{{ ref.url }}</div>
-            <div class="ref_visits">{{ ref.visits }}</div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
+    <tr ng-repeat="data in array">
+      <td>{{ data.url }}</td>
+      <td>{{ data.visits }}</td>
+      <td> 
+        <div class="referrer" ng-repeat="ref in data.referrers">
+          <div class="ref_url">{{ ref.url }}</div>
+          <div class="ref_visits">{{ ref.visits }}</div>
+        </div>
+      </td>
+    </tr>
   </table>
 </div>
