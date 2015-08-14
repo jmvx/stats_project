@@ -5,6 +5,10 @@ class Record < ActiveRecord::Base
     where('date_created_at >= ? and date_created_at <= ?', start_day, end_day)
   end
 
+  def self.where_date_and_url_are(given_day, given_url)
+    where('date_created_at = ? and url = ?', given_day, given_url)
+  end
+
   # Queries database and generates hash containing top_url information
   def self.top_urls    
     # Sets date range to last 5 days
@@ -44,12 +48,13 @@ class Record < ActiveRecord::Base
                       .order("total DESC")
                       .limit(10)
       top_ten.each do |t|
-        # Create URL hash { url: <url>, visits: <visits>, referrers: [array of referrers] }
+        # Create URL hash
+        # { url: <url>, visits: <visits>, referrers: [array of referrers] }
         url_visits = { :url => t.url, :visits => t.total }
         refs = []
         # Query database for top 5 referrers, for each date and url
         referrers = Record.select("referrer, count(referrer) AS ref_total")
-                          .where('date_created_at = ? and url = ?', the_date, t.url)
+                          .where_date_and_url_are(the_date, t.url)
                           .group(:referrer)
                           .order(:url)
                           .order('ref_total DESC')
