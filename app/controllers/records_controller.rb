@@ -35,7 +35,7 @@ class RecordsController < ApplicationController
     @record = Record.new(record_params)
     respond_to do |format|
       if @record.save
-        format.html { redirect_to root }
+        format.html { redirect_to @record }
         format.json { render json: @record }
       else
         format.html { redirect_to root }
