@@ -1,29 +1,30 @@
 class Record < ActiveRecord::Base
   before_save :create_hash
+  
+  def self.between_dates(start_day, end_day)
+    where('date_created_at >= ? and date_created_at <= ?', start_day, end_day)
+  end
 
   # Queries database and generates hash containing top_url information
-  def self.top_urls
+  def self.top_urls    
     # Sets date range to last 5 days
     end_day = DateTime.current.utc.to_date
     start_day = end_day - 4
     # Queries database for URLs within range
     # Groups by Date/URL and sorts by URL views
-    records = Record.select("url, count(url) AS total, date_created_at")
-                    .where('date_created_at >= ? and date_created_at <= ?', start_day, end_day)
+    records = Record.select("url, count(url) AS visits, date_created_at")
+                    .between_dates(start_day, end_day)
                     .group(:date_created_at)
                     .group(:url)
                     .order(:date_created_at)
-                    .order("total DESC")
+                    .order("visits DESC")
     # Creates Hash to return and use for JSON { date: <url data> }
     hash_by_date = Hash.new{|hash, key| hash[key] = Array.new}
-    start_time = Time.now
     records.each do |record|
       # Create Hash { url: <url>, visits: <visits> } and add to hash_by_date
-      url_visits = { :url => record.url, :visits => record.total }
+      url_visits = { :url => record.url, :visits => record.visits }
       hash_by_date[record.date_created_at].push(url_visits)
     end
-    end_time = Time.now
-    puts end_time - start_time
     return hash_by_date
   end
 

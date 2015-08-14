@@ -22,10 +22,7 @@ ActiveRecord::Schema.define(version: 20150812215643) do
     t.date     "date_created_at",             null: false
   end
 
-  add_index "records", ["created_at", "url"], name: "index_records_on_created_at_and_url", using: :btree
   add_index "records", ["date_created_at", "url"], name: "index_records_on_date_created_at_and_url", using: :btree
-  add_index "records", ["url", "created_at"], name: "url", using: :btree
-  add_index "records", ["url", "date_created_at"], name: "index_records_on_url_and_date_created_at", using: :btree
   add_index "records", ["url"], name: "index_records_on_url", using: :btree
 
 end

@@ -1,23 +1,23 @@
 class RecordsController < ApplicationController
-
-  # GETS /top_urls or /top_urls.json
-  # Displays number of visits per URL for the last 5 days
+  
+  # /top_urls
   def top_urls
-    @records = Record.top_urls
-    respond_to do |format|
-      format.html
-      format.json { render :json => @records }
-    end
   end
 
-  # GETS /top_referrers
-  # Displays top 10 urls and their top 5 referrers for the last 5 days
+  # /top_referrers
   def top_referrers
+  end
+
+  # /get_top_urls.json
+  def get_top_urls
+    @records = Record.top_urls
+    render json: @records
+  end
+  
+  # /get_top_referrers.json
+  def get_top_referrers
     @records = Record.top_referrers
-    respond_to do |format|
-      format.html 
-      format.json { render :json => @records }
-    end
+    render json: @records
   end
 
   def index
