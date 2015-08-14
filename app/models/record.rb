@@ -1,73 +1,84 @@
 class Record < ActiveRecord::Base
   before_save :create_hash
-  
+
+  # Queries database and generates hash containing top_url information
   def self.top_urls
-   end_day = DateTime.current.utc.to_date
-   start_day = end_day - 4
-   records = Record.select("url, count(url) AS total, date_created_at").where('date_created_at >= ? and date_created_at <= ?', start_day, end_day).group(:date_created_at).group(:url).order("total DESC")
-   start_time = Time.current.utc
-   obj = Hash.new{|hash, key| hash[key] = Array.new}
-   records.each do |record|
-      url_visits = {}
-      url_visits.store(:url, record.url)
-      url_visits.store(:visits, record.total)
-      obj[record.date_created_at].push(url_visits)
+    # Sets date range to last 5 days
+    end_day = DateTime.current.utc.to_date
+    start_day = end_day - 4
+    # Queries database for URLs within range
+    # Groups by Date/URL and sorts by URL views
+    records = Record.select("url, count(url) AS total, date_created_at")
+                    .where('date_created_at >= ? and date_created_at <= ?', start_day, end_day)
+                    .group(:date_created_at)
+                    .group(:url)
+                    .order(:date_created_at)
+                    .order("total DESC")
+    # Creates Hash to return and use for JSON { date: <url data> }
+    hash_by_date = Hash.new{|hash, key| hash[key] = Array.new}
+    start_time = Time.now
+    records.each do |record|
+      # Create Hash { url: <url>, visits: <visits> } and add to hash_by_date
+      url_visits = { :url => record.url, :visits => record.total }
+      hash_by_date[record.date_created_at].push(url_visits)
     end
-    end_time = Time.current.utc
+    end_time = Time.now
     puts end_time - start_time
-    return obj
+    return hash_by_date
   end
-  
+
+  # Queries database and generates hash containing top_referrers information
   def self.top_referrers
-    # Get array of dates to group hash by
+    # Sets date range to last 5 days and create array of dates
     end_day = DateTime.current.utc.to_date
     start_day = end_day - 4
     date_array = get_dates(start_day, end_day)
-    
-    # initialize hash
-    obj = Hash.new{|hash, key| hash[key] = Array.new}
-    
-    # loop over each date in array and construct a query to get top 10 urls
+    # Creates Hash to return and use for JSON { date: <url data> }
+    hash_by_date = Hash.new{|hash, key| hash[key] = Array.new}
     date_array.each do |the_date|
-      top_ten = Record.select("url, count(url) AS total").where('date_created_at = ?', the_date).group(:url).order("total DESC").limit(10)
-      
-      # loop over each top_10 url and query for their referrer urls and counts
+      # Query database for top 10 URLs for each of the 5 dates
+      top_ten = Record.select("url, count(url) AS total")
+                      .where('date_created_at = ?', the_date)
+                      .group(:url)
+                      .order("total DESC")
+                      .limit(10)
       top_ten.each do |t|
-        url_visits = {}
-        url_visits.store(:url, t.url)
-        url_visits.store(:visits, t.total)
-        
+        # Create URL hash { url: <url>, visits: <visits>, referrers: [array of referrers] }
+        url_visits = { :url => t.url, :visits => t.total }
         refs = []
-        # Query for top 5 referrers on a particular day and for a particular url
-        referrers = Record.select("referrer, count(referrer) AS ref_total").where('date_created_at = ? and url = ?', the_date, t.url).group(:referrer).order(:url).order('ref_total DESC').limit(5)
-        start_time = Time.current.utc
+        # Query database for top 5 referrers, for each date and url
+        referrers = Record.select("referrer, count(referrer) AS ref_total")
+                          .where('date_created_at = ? and url = ?', the_date, t.url)
+                          .group(:referrer)
+                          .order(:url)
+                          .order('ref_total DESC')
+                          .limit(5)
         referrers.each do |r|
-          # create referrer url-visits hash
-          ref_visits = {}
-          ref_visits.store(:url, r.referrer)
-          ref_visits.store(:visits, r.ref_total)
-          # add to array of referrers
-          refs.push(ref_visits)
+          # Create hash of referrers for each URL in the top 10 URLs and add 
+          # to referrers array
+          if r.referrer != nil
+            ref_visits = { :url => r.referrer, :visits => r.ref_total }
+            refs.push(ref_visits)
+          end
         end
-        end_time = Time.current.utc
-        puts end_time - start_time 
-        
-        # push array of referrers onto url_visits
-        url_visits.store(:referrers, refs)
-        
-        obj[the_date].push(url_visits)
+        # Add array of referrers to URL hash
+        # Add URL hash to hash_by_date
+        url_visits[:referrers] = refs
+        hash_by_date[the_date].push(url_visits)
       end
-      
      end
-    return obj
+    return hash_by_date
   end
-  
+
   private
-  
+
+    # Returns array of dates between start and end date
     def self.get_dates(start_date, end_date)
       return (start_date.to_date..end_date).map{ |date| date.strftime("%Y-%m-%d") }
     end
   
+    # Use id, url, referrer, and created_at for md5 hash
+    # Calculate md5 hash before_save
     def create_hash
       require 'digest/md5'
       digest_string = [self.id, self.url, self.referrer, self.created_at].join("")

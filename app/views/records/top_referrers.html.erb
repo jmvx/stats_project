@@ -1,9 +1,14 @@
 <h1 class="page_title">Top 5 Referrers for the Top 10 URLs: Last 5 Days </h1>
 
 <div class="container" ng-app="MyAnalytics" ng-controller="getTopReferrers">
+  
+<ul class="navigation" ng-repeat="(date, data) in reports">
+  <li><a href="#{{date}}">{{ date }}</a></li>
+</ul>
 
-<div ng-repeat="(date, array) in reports | orderBy: date ">
-  <h2 class="date">{{ date }}</h2>
+<div ng-repeat="(date, array) in reports">
+  <a name="{{date}}"><h2 class="date">{{ date }}</h2></a>
+  <a href="#top"><span class="back">Go back to top</span></a>
   <table>
     <tr>
       <th>URL</th>
