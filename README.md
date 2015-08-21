@@ -1,6 +1,6 @@
 # It's All About Stats
 
-This is a Rails application that uses MySQL and AngularJS to calculate and display:
+This is a Rails application that uses MySQL, Sequel, and AngularJS to calculate and display:
 
 1. Number of page views per URL, grouped by day, for the past 5 days
 
@@ -8,14 +8,12 @@ This is a Rails application that uses MySQL and AngularJS to calculate and displ
 
 ## Running the application
 
-To run this application, you will need Rails and MySQL installed. You can reset and seed database with:
+To run this application, you will need Rails and MySQL installed.
 
 ```
-rake db:reset
-```
-
-```
-rails server
+$ bundle install
+$ rake db:reset
+$ rails server
 ```
 
 ## Viewing the data
