@@ -25,9 +25,9 @@ class Record < Sequel::Model
     records = Record.select{[url, count(url).as(visits), date_created_at]}
                     .between_dates(start_day, end_day)
                     .group(:date_created_at)
-                    .group(:url)
+                    .group_append(:url)
                     .order(:date_created_at)
-                    .reverse{:visits}
+                    .reverse(:visits)
     # Creates Hash to return and use for JSON { date: <url data> }
     hash_by_date = Hash.new{|hash, key| hash[key] = Array.new}
     records.each do |record|
